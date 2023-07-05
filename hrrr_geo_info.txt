@@ -1,0 +1,49 @@
+Size is 1799, 1059
+Coordinate System is:
+PROJCRS["unnamed",
+    BASEGEOGCRS["Coordinate System imported from GRIB file",
+        DATUM["unnamed",
+            ELLIPSOID["Sphere",6371229,0,
+                LENGTHUNIT["metre",1,
+                    ID["EPSG",9001]]]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433,
+                ID["EPSG",9122]]]],
+    CONVERSION["unnamed",
+        METHOD["Lambert Conic Conformal (2SP)",
+            ID["EPSG",9802]],
+        PARAMETER["Latitude of false origin",38.5,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8821]],
+        PARAMETER["Longitude of false origin",262.5,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8822]],
+        PARAMETER["Latitude of 1st standard parallel",38.5,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8823]],
+        PARAMETER["Latitude of 2nd standard parallel",38.5,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8824]],
+        PARAMETER["Easting at false origin",0,
+            LENGTHUNIT["Metre",1],
+            ID["EPSG",8826]],
+        PARAMETER["Northing at false origin",0,
+            LENGTHUNIT["Metre",1],
+            ID["EPSG",8827]]],
+    CS[Cartesian,2],
+        AXIS["easting",east,
+            ORDER[1],
+            LENGTHUNIT["Metre",1]],
+        AXIS["northing",north,
+            ORDER[2],
+            LENGTHUNIT["Metre",1]]]
+Data axis to CRS axis mapping: 1,2
+Origin = (-2699020.142521930392832,1588193.847443336388096)
+Pixel Size = (3000.000000000000000,-3000.000000000000000)
+Corner Coordinates:
+Upper Left  (-2699020.143, 1588193.847) (134d 7'17.14"W, 47d50'44.64"N)
+Lower Left  (-2699020.143,-1588806.153) (122d43'44.80"W, 21d 7'19.89"N)
+Upper Right ( 2697979.857, 1588193.847) ( 60d53'28.48"W, 47d50'57.51"N)
+Lower Right ( 2697979.857,-1588806.153) ( 72d16'48.48"W, 21d 7'28.62"N)
+Center      (    -520.143,    -306.153) ( 97d30'21.52"W, 38d29'50.09"N)
+

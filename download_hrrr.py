@@ -8,17 +8,12 @@ import subprocess as sp
 
 ###### SETUP AND USER INPUT ######
 odir = '/home/tsw35/tyche/data/HRRR/' # destination directory
-fs= 'noaa-hrrr-bdp-pds/'
-dates=['20170719']
-
+dates=['20170719','20170720']
 ###### MAIN BODY #######
 s3 = s3fs.S3FileSystem(anon=True)
 for date in dates:
+    fs= 'noaa-hrrr-bdp-pds/'
     fs=fs+'hrrr.'+date+'/conus/'
-    try:
-        sp.run('mkdir '+odir+date,shell=True)
-    except Exception as e:
-        print(e)
     print('Beginning download for '+date,flush=True)
     print('  Retrieving file list...',flush=True)
     files = s3.ls(fs)
@@ -26,12 +21,17 @@ for date in dates:
     for file in files:
         if ('prs' in file) and ('f00' in file) and ('idx' not in file):
             print('    '+file,end='...',flush=True)
-            s3.get(file,odir+date)
+            s3.get(file,odir)
             print('  DOWNLOADED',flush=True)
     print('  '+date+' COMPLETE')
+    
+    for file in os.listdir(odir):
+        if 'hrrr2' in file:
+            continue
+        ff=odir+file
+        sp.run('mv '+ff+' '+odir+'hrrr2.'+date+'.'+file[5:9]+'.grib2',shell=True)
+    print('moved')
     print()
-
-
 
 
 

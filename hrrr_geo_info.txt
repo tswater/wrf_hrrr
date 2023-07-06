@@ -1,3 +1,15 @@
+PROJ PARAMS:
+  {'a': 6371229,
+   'b': 6371229,
+   'proj': 'lcc',
+   'lon_0': 262.5,
+   'lat_0': 38.5,
+   'lat_1': 38.5,
+   'lat_2': 38.5}
+
+
+
+
 Size is 1799, 1059
 Coordinate System is:
 PROJCRS["unnamed",

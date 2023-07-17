@@ -3,7 +3,7 @@
   max_dom = 1,
   start_date = '2017-07-19_12:00:00',
   end_date   = '2017-07-20_12:00:00',
-  interval_seconds = 10800,
+  interval_seconds = 3600,
   ! io_form_geogrid = 2
 /
 

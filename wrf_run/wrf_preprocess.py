@@ -8,6 +8,7 @@ import netCDF4 as nc
 import rasterio
 from datetime import datetime
 from datetime import timedelta
+import sys
 
 # ------------------------------------------------------------------------- #
 # ----------------------- USER INPUTS and CONSTANTS ----------------------- #
@@ -23,8 +24,8 @@ e_sn           = 53 # number of gridcells in north_south direction (n+1)
 e_vert         = 51  # number of gridcells from top to bottom
 dx             = 3000 # gridcell size for mass grid
 dy             = 3000 # gridcell size for mass grid
-start_date     = '2017-07-19_9:00:00' # format 'yyyy-mm-dd_hh:mm:ss'
-end_date       = '2017-07-20_9:00:00' # format 'yyyy-mm-dd_hh:mm:ss'
+start_date     = '2017-07-19_09:00:00' # format 'yyyy-mm-dd_hh:mm:ss'
+end_date       = '2017-07-20_09:00:00' # format 'yyyy-mm-dd_hh:mm:ss'
 dt             = 15 # timestep for the WRF model in seconds
 
 #### PROJECTION #####
@@ -58,6 +59,21 @@ log_dir = 'logs/'
 tbl_dir = 'tables/'
 run_dir = os.getcwd()+'/'
 
+
+#### MAKE SOME FOLDERS ####
+try:
+    os.mkdir(log_dir)
+except:
+    pass
+try:
+    os.mkdir(met_dir)
+except:
+    pass
+try:
+    os.mkdir(out_dir)
+except:
+    pass
+
 proj = "+proj=lcc +a=6371229 +b=6371229 +lon_0="+str(stand_lon)+" +lat_1="+\
        str(truelat1)+" +lat_2="+str(truelat2)
 
@@ -66,6 +82,7 @@ start_dt = datetime.strptime(start_date,'%Y-%m-%d_%X')
 end_dt   = datetime.strptime(end_date,'%Y-%m-%d_%X')
 dt_met   = timedelta(hours=1)
 runtime  = end_dt-start_dt
+runhours = int(runtime.total_seconds()/3600)
 
 # -------------------------------------------------------------------------- #
 # ---------------------------- DOMAIN SETUP -------------------------------- #
@@ -78,7 +95,7 @@ print('SETTING UP DOMAIN (GEOGRID)',flush=True)
 #### EDIT NAMELIST.WPS ####
 print('  Modifying WPS namelist...',end='',flush=True)
 wps_write =''
-fp_wps = open(namelist_dir+'template/namelist.wps','r')
+fp_wps = open(namelist_dir+'templates/namelist.wps','r')
 for line in fp_wps:
     if 'start_date' in line:
         wps_write += ' start_date = \''+start_date+'\','+'\n'
@@ -103,7 +120,7 @@ for line in fp_wps:
     elif 'stand_lon' in line:
         wps_write += ' stand_lon = '+str(stand_lon)+','+'\n'
     elif 'geog_data_path' in line:
-        wps_write += ' geog_data_path = \''+wps_geo_loc+'\''+'\n'
+        wps_write += ' geog_data_path = \''+wps_geo_dir+'\''+'\n'
     elif 'opt_output_from_metgrid_path' in line:
         wps_write += ' opt_output_from_metgrid_path = \''+str(run_dir+met_dir)+'\','+'\n'
     else:
@@ -117,10 +134,10 @@ print('COMPLETE',flush=True)
 #### RUN GEOGRID ####
 print('  Running Geogrid.exe')
 os.chdir(wps_dir)
-sp.run('mv '+run_dir+namelist_dir+'namelist.wps '+wps_dir,shell=True)
+sp.run('cp '+run_dir+namelist_dir+'namelist.wps '+wps_dir,shell=True)
 sp.run('./geogrid.exe >'+run_dir+log_dir+'geogrid_log.txt',shell=True)
 os.chdir(run_dir)
-sp.run('mv '+wps_dir+'geo_em.d01.nc .',shell=True)
+sp.run('cp '+wps_dir+'geo_em.d01.nc .',shell=True)
 print('  Geogrid Run Complete')
 print('DOMAIN SETUP COMPLETE\n',flush=True)
 
@@ -135,7 +152,7 @@ rmfiles=[]
 for file in os.listdir(wps_dir):
     if 'GRIBFILE.' in file:
         rmfiles.append(file)
-    elif 'FILE:'
+    elif 'FILE:' in file:
         rmfiles.append(file)
 for file in rmfiles:
     sp.run('rm '+wps_dir+file,shell=True)
@@ -146,16 +163,18 @@ print('  checking if ungrib is needed...',flush=True,end='')
 ungrib=False
 ungrib_files=os.listdir(ungrib_dir)
 final_files=[]
-for t in range(start_dt,end_dt,dt_met):
+for t in (start_dt+timedelta(hours=n) for n in range(runhours+1)):
     t_str=t.strftime('%Y-%m-%d_%H')
+    final_files.append('FILE:'+t_str)
     if ('FILE:'+t_str) in ungrib_files:
-        final_files.append('FILE:'+t_str)
+        continue
     else:
         ungrib=True
 
 # if ungrib unecessary, only need to link
 if not ungrib:
     print('COMPLETE ungrib is not required')
+    os.chdir(wps_dir)
     for file in final_files:
         sp.run('ln -s '+ungrib_dir+file+' '+file,shell=True)
     print('UNGRIB COMPLETE!\n',flush=True)
@@ -167,12 +186,14 @@ if ungrib:
     sp.run('ln -s '+vtable+' Vtable',shell=True) #link to Vtable
     print('  generating ungrib filelist...',flush=True,end='')
     
-
-    filelist=[]
-    for t in range(start_dt,end_dt,dt_met):
+    filelist=''
+    for t in (start_dt+timedelta(hours=n) for n in range(runhours+1)):
         file=t.strftime('hrrr2.%Y%m%d.t%Hz.grib2')
-        filelist.append(hrrr_dir+file)
-    sp.run('./link_grib.csh '+str(filelist),shell=True)    
+        filelist+=(hrrr_dir+file+' ')
+
+    cmd = './link_grib.csh '+str(filelist)
+    print(cmd)
+    sp.run(cmd,shell=True)    
     print('COMPLETE')
     print('  beginning ungrib...',flush=True,end='')
     sp.run('./ungrib.exe >'+run_dir+log_dir+'ungrib_log.txt',shell=True)
@@ -185,6 +206,7 @@ if ungrib:
 #### METGRID ####
 print('GENERATING MET FILES',flush=True)
 print('  ...',flush=True)
+os.chdir(wps_dir)
 sp.run('ln -s '+mettable+' METGRID.TBL',shell=True) #link to METGRID.TBL
 sp.run('./metgrid.exe',shell=True)
 os.chdir(run_dir)
@@ -200,11 +222,11 @@ print('METGRID COMPLETE\n',flush=True)
 #### MODIFY NAMELIST.INPUT ####
 print('Modifying WRF namelist...',end='',flush=True)
 wrf_write =''
-fp_wrf = open(namelist_dir+'template/namelist.input','r')
+fp_wrf = open(namelist_dir+'templates/namelist.input','r')
 for line in fp_wrf:
     if 'run_days' in line:
         wrf_write += ' run_days = '+str(runtime.days)+','+'\n'
-    elif 'run_days' in line:
+    elif 'run_hours' in line:
         wrf_write += ' run_hours = '+str(int(runtime.seconds/3600))+','+'\n'
     elif 'start_year' in line:
         wrf_write += ' start_year = '+str(start_dt.year)+',\n'
@@ -241,14 +263,6 @@ fp_out = open(namelist_dir+'namelist.input','w')
 fp_out.write(wrf_write)
 fp_out.close()
 print('COMPLETE',flush=True)
-
-
-#### SETUP LINKS ####
-print('Setting up links to WRF run tables and files...',end='',flush=True)
-sp.run('ln -s '+wrf_dir+'main/'+'real.exe .',shell=True) # real.exe
-sp.run('ln -s '+wrf_dir+'main/'+'wrf.exe .',shell=True)  # wrf.exe
-print('COMPLETE',flush=True)
-
 
 # -------------------------------------------------------------------------- #
 # ------------------------------- CLEAN ------------------------------------ #

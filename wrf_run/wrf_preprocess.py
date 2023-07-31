@@ -19,8 +19,8 @@ import sys
 #### DOMAIN DESCRIPTION ####
 lat_center     = 38.5 # latitude of the center of the domain
 lon_center     = -97.5 # longitude of the center of the domain
-e_we           = 90 # number of gridcells in west_east direction (n+1)
-e_sn           = 53 # number of gridcells in north_south direction (n+1)
+e_we           = 1560 # number of gridcells in west_east direction (n+1)
+e_sn           = 1040 # number of gridcells in north_south direction (n+1)
 e_vert         = 51  # number of gridcells from top to bottom
 dx             = 3000 # gridcell size for mass grid
 dy             = 3000 # gridcell size for mass grid
@@ -254,8 +254,8 @@ for line in fp_wrf:
         wrf_write += 'dx = '+str(dx)+','+'\n'
     elif 'dy ' in line:
         wrf_write += 'dy = '+str(dy)+','+'\n'
-    elif 'time_step ' in line:
-        wrf_write += 'time_step = '+str(dt)+',\n'
+    elif ' time_step ' in line:
+        wrf_write += ' time_step = '+str(dt)+',\n'
     else:
         wrf_write += line
 fp_wrf.close()

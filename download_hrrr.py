@@ -8,7 +8,8 @@ import subprocess as sp
 
 ###### SETUP AND USER INPUT ######
 odir = '/home/tsw35/tyche/data/HRRR/' # destination directory
-dates=['20170719','20170720']
+dates=['20170717','20170716','20170718','20180709','20180710','20160625','20160626']
+
 ###### MAIN BODY #######
 s3 = s3fs.S3FileSystem(anon=True)
 for date in dates:

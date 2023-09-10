@@ -9,8 +9,8 @@ import numpy as np
 import re
 
 ###### SETUP AND USER INPUT ######
-odir = '/home/tsw35/tyche/data/HRRR/' # destination directory
-dates=['20160626','20180709','20180710']
+odir = '/home/tsw35/tyche/data/HRRRp/' # destination directory
+dates=['20170716','20170717','20170718','20170719','20170720','20160625','20160626','20180709','20180710','20220803','20220804']
 
 ###### MAIN BODY #######
 
@@ -29,7 +29,7 @@ for date in dates:
     genfile=''
 
     for file in files:
-        if ('prs' in file) and ('f00' in file) and ('idx' not in file):
+        if ('prs' in file) and ('f01' in file) and ('idx' not in file):
             print('    '+file,end='...',flush=True)
             s3.get(file,odir)
             genfile=file
@@ -50,8 +50,8 @@ for date in dates:
     for t in range(24):
         if dwnld[t]==0:
             if t==0:
-                print('ERROR t00z NOT AVAILABLE')
-                print('ERROR t00z NOT AVAILABLE')
+                print('ERROR t01z NOT AVAILABLE')
+                print('ERROR t01z NOT AVAILABLE')
                 quitloop=True
                 break
             t2=t-1
@@ -61,16 +61,16 @@ for date in dates:
                 tstr=str(t2)
             
             fname=re.sub(r"t\d+z",'t'+tstr+'z',genfile)
-            fname=re.sub('f00','f01',fname)
-            print('  missing f00 for '+tstr)
+            fname=re.sub('f01','f02',fname)
+            print('  missing f01 for '+tstr)
             print('  Trying with '+fname)
             try:
                 s3.get(fname,odir+date+str(t)+'hrrr2')
             except:
                 t2=t2-1
                 if t2<0:
-                    print('ERROR t0-1z NOT AVAILABLE')
-                    print('ERROR t0-1z NOT AVAILABLE')
+                    print('ERROR t02z NOT AVAILABLE')
+                    print('ERROR t02z NOT AVAILABLE')
                     quitloop=True
                     break
                 if t2<10:
@@ -78,7 +78,7 @@ for date in dates:
                 else:
                     tstr2=str(t2)
                 fname=re.sub('t'+tstr+'z',tstr2,fname)
-                fname=re.sub('f01','f02',fname)
+                fname=re.sub('f02','f03',fname)
                 print('  ... FAILED Trying with '+fname)
                 try:
                     s3.get(fname,odir+date+str(t)+'hrrr2')

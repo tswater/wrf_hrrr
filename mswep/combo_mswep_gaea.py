@@ -1,3 +1,5 @@
+# reproject MSWEP onto 3km WRF grid
+
 import numpy as np
 import os
 from subprocess import run

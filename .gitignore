@@ -10,7 +10,7 @@
 *.rar
 *.tar
 *.zip
-*.png
+#*.png
 
 # OS generated files #
 ######################
@@ -26,4 +26,4 @@ Thumbs.db
 # JUPYTER #
 ###########
 *.ipynb
-
+*ipynb_checkpoints

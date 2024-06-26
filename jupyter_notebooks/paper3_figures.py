@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.15.2
+#       jupytext_version: 1.16.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -29,7 +29,7 @@ import matplotlib.patheffects as pe
 import matplotlib
 import scipy as sci
 from IPython.display import HTML
-import wrf
+#import wrf
 from sklearn.metrics import mean_squared_error
 from matplotlib.gridspec import GridSpec
 import cmasher as cmr
@@ -93,9 +93,15 @@ def databig2(data):
 
 
 # %%
-fp2d=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/agg_2d.nc','r')
-fpagg=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/agg_full.nc','r')
-fpscl=nc.Dataset('/home/tsw35/tyche/wrf_hrrr/agg_scaling.nc','r')
+### CLUSTER PATH ###
+#fp2d=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/agg_2d.nc','r')
+#fpagg=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/agg_full.nc','r')
+#fpscl=nc.Dataset('/home/tsw35/tyche/wrf_hrrr/agg_scaling.nc','r')
+
+### FRAMEWORK PATH ###
+frkdir='/home/tswater/Documents/Elements_Temp/WRF/'
+fpscl=nc.Dataset(frkdir+'agg_files/agg_scaling.nc','r')
+
 
 
 # %%
@@ -119,8 +125,15 @@ cbarlabel2=r'LH ($W/m^{-2}$)'
 cbarlabel3=r'$T_{skin}$ ($K$)'
 lbsize=14
 
-fpt=nc.Dataset('/home/tsw35/tyche/wrf_hrrr/scaling/het/OUTPUT/wrfout_d01_2023-07-07_19:00:00','r')
-fpg=nc.Dataset('/home/tsw35/tyche/wrf_hrrr/scaling/hmg060/OUTPUT/wrfout_d01_2023-07-07_19:00:00','r')
+### CLUSTER PATH ###
+#fpt=nc.Dataset('/home/tsw35/tyche/wrf_hrrr/scaling/het/OUTPUT/wrfout_d01_2023-07-07_19:00:00','r')
+#fpg=nc.Dataset('/home/tsw35/tyche/wrf_hrrr/scaling/hmg060/OUTPUT/wrfout_d01_2023-07-07_19:00:00','r')
+
+### FRAMEWORK PATH ###
+frkdir='/home/tswater/Documents/Elements_Temp/WRF/'
+fpt=nc.Dataset(frkdir+'scaling_compressed/het/wrfout_d01_2023-07-07_190000','r')
+fpg=nc.Dataset(frkdir+'scaling_compressed/hmg060/wrfout_d01_2023-07-07_190000','r')
+
 
 fig = plt.figure(figsize=(6,6),layout='tight')
 subfigs = fig.subfigures(1, 3, hspace=0,wspace=0, width_ratios=[1,1, 1],frameon=False)
@@ -129,7 +142,7 @@ ht=fpscl['HFX'][0,10,:,:]
 hg=databig(meani(ht))#fpscl['HFX'][-2,10,:,:]
 lt=fpscl['LH'][0,10,:,:]
 lg=databig(meani(lt))#fpscl['LH'][-2,10,:,:]
-tt=fpt['TSK'][0,:,:]
+tt=fpscl['TSK'][0,10,:,:]
 tg=databig(meani(tt))#fpg['TSK'][0,:,:]
 
 vxh=np.nanpercentile(ht,99)
@@ -205,6 +218,53 @@ cb=grid.cbar_axes[0].colorbar(im,label=cbarlabel3)
 grid.cbar_axes[0].tick_params(labelsize=lbsize)
 cb.set_label(label=cbarlabel3,size=lbsize)
 plt.savefig('fig2.png', bbox_inches = "tight")
+
+# %% [markdown]
+# # Figure 2 Alt (HFX only)
+
+# %%
+fig = plt.figure(figsize=(6,6),layout='tight')
+
+cbarlabel1=r'H ($W/m^{-2}$)'
+cbarlabel2=r'LH ($W/m^{-2}$)'
+cbarlabel3=r'$T_{skin}$ ($K$)'
+lbsize=14
+
+ht=fpscl['HFX'][0,10,:,:]
+hg=databig(meani(ht))#fpscl['HFX'][-2,10,:,:]
+
+vxh=np.nanpercentile(ht,99)
+
+vnh=np.nanpercentile(ht,1)
+
+grid=ImageGrid(fig, 111,  # similar to subplot(111)
+                nrows_ncols=(1, 2),
+                axes_pad=0.05,
+                cbar_mode='single',
+                cbar_location='right',
+                cbar_pad=.02,
+                cbar_size="5%")
+
+im=grid[0].imshow(ht,origin='lower',cmap=hmap,vmin=vnh,vmax=vxh)
+im=grid[1].imshow(hg,origin='lower',cmap=hmap,vmin=vnh,vmax=vxh)
+
+grid[0].grid(False)
+grid[0].set_xticks([],[])
+grid[0].set_yticks([],[])
+grid[1].grid(False)
+grid[1].set_xticks([],[])
+grid[1].set_yticks([],[])
+
+grid[0].set_xlabel('LSM Output')
+grid[1].set_xlabel('60km HMG')
+
+cb=grid.cbar_axes[0].colorbar(im,label=cbarlabel1)
+grid.cbar_axes[0].tick_params(labelsize=lbsize)
+cb.set_label(label=cbarlabel1,size=lbsize)
+
+plt.savefig('fig2_alt.png', bbox_inches = "tight")
+
+# %%
 
 # %%
 

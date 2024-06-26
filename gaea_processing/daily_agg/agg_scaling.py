@@ -8,10 +8,13 @@ import sys
 #argv = sys.argv[1:]
 #gaea_dir = argv[0]
 
+### CLUSTER FILEPATHS ###
 gaea_dir='/home/tsw35/tyche/wrf_hrrr/compressed/'
-
-#gaea_dir='/home/tsw35/xTyc_shared/compressed_output/'
 odir='/home/tsw35/tyche/wrf_hrrr/'
+
+### FRAMEWORK FILEPATHS ###
+gaea_dir='/run/media/tswater/Elements/WRF/scaling_compressed/'
+odir='/home/tswater/Documents/Elements_Temp/WRF/agg_files/'
 
 #### MEANS AND VARIANCES ####
 def vari(data,df=20):
@@ -55,13 +58,13 @@ for scl in scls:
     print(scl,flush=True)
     hrs=os.listdir(gaea_dir+scl)
     hrs.sort()
-    
+
     i=0
     for hr in hrs:
         print('   '+hr,flush=True)
-        
+
         fp=nc.Dataset(gaea_dir+scl+'/'+hr,'r')
-        
+
         hfx[s,i,:,:]=fp['HFX'][0,:]
         lh[s,i,:,:]=fp['LH'][0,:]
         tsurf[s,i,:,:]=fp['TSK'][0,:]
@@ -76,14 +79,11 @@ for scl in scls:
 
 
 #### CREATE OUTPUT ####
-try:
-    fp=nc.Dataset(odir+'agg_scaling.nc','r+')
-except Exception:
-    fp=nc.Dataset(odir+'agg_scaling.nc','w')
-    fp.createDimension('we',1559)
-    fp.createDimension('sn',1039)
-    fp.createDimension('time',N)
-    fp.createDimension('scale',7)
+fp=nc.Dataset(odir+'agg_scaling.nc','w')
+fp.createDimension('we',1559)
+fp.createDimension('sn',1039)
+fp.createDimension('time',N)
+fp.createDimension('scale',7)
 
 fp.createVariable('HFX','f4',('scale','time','sn', 'we'))
 fp.createVariable('TSK','f4',('scale','time','sn', 'we'))

@@ -85,7 +85,7 @@ for file in flist:
 
     het_tke[t,:,:]=np.mean(fpin['MsKE_het'][24:48,:,:],axis=0)
     hmg_tke[t,:,:]=np.mean(fpin['MsKE_hmg'][24:48,:,:],axis=0)
-    
+
     het_tkelo[t,:,:]=np.mean(fpin['MsKElo_het'][24:48,:,:],axis=0)
     hmg_tkelo[t,:,:]=np.mean(fpin['MsKElo_hmg'][24:48,:,:],axis=0)
 
@@ -102,12 +102,12 @@ for file in flist:
     clouds_hmg[t,0,:,:]=np.mean(fpin['LOCLOUD_hmg'][24:48,:,:],axis=0)
     clouds_hmg[t,1,:,:]=np.mean(fpin['MDCLOUD_hmg'][24:48,:,:],axis=0)
     clouds_hmg[t,2,:,:]=np.mean(fpin['HICLOUD_hmg'][24:48,:,:],axis=0)
-    
+
     het_hfx[t,:,:]=np.mean(fpin['HFX_het'][24:48,:,:],axis=0)
     hmg_hfx[t,:,:]=np.mean(fpin['HFX_hmg'][24:48,:,:],axis=0)
     hfx60[t,:,:]=np.mean(fpin['HFX_60'][24:48,:,:],axis=0)
     het_hfxv[t,:,:]=np.mean(fpin['VARHFX_het'][24:48,:,:],axis=0)
-    
+
     het_lh[t,:,:]=np.mean(fpin['LH_het'][24:48,:,:],axis=0)
     hmg_lh[t,:,:]=np.mean(fpin['LH_hmg'][24:48,:,:],axis=0)
     lh60[t,:,:]=np.mean(fpin['LH_60'][24:48,:,:],axis=0)
@@ -124,7 +124,7 @@ for file in flist:
     time[t]=(dt-d0).total_seconds()
 
     t=t+1
-    
+
 #### CREATE OUTPUT ####
 try:
     fp=nc.Dataset(odir+'all/agg_full.nc','r+')
@@ -133,14 +133,14 @@ except Exception:
     #fp.createDimension('we',1559)
     #fp.createDimension('sn',1039)
     fp.createDimension('time',N)
-    
+
 try:
     fp.createDimension('we'+dimscln,wescl)
     fp.createDimension('sn'+dimscln,snscl)
 except Exception:
     pass
-    
-    
+
+
 #### FINISH OUTPUT SETUP ####
 try:
     fp.createVariable('seconds_from_2020','i4',('time'))
@@ -160,7 +160,7 @@ for var in bigvars:
         pass
 
 
-    
+
 #### OUTPUT DATA ####
 fp['MsKE_het'][:]=het_tke[:]
 fp['MsKE_hmg'][:]=hmg_tke[:]
@@ -188,7 +188,7 @@ fp['LH_60'][:]=lh60[:]
 fp['VARLH_het'][:]=het_lhv
 fp['RAINNC_hmg'][:]=hmg_r[:]
 fp['RAINNC_het'][:]=het_r[:]
-    
+
 fp.close()
 
 

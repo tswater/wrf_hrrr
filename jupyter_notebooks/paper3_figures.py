@@ -97,11 +97,22 @@ def databig2(data):
 #fp2d=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/agg_2d.nc','r')
 #fpagg=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/agg_full.nc','r')
 #fpscl=nc.Dataset('/home/tsw35/tyche/wrf_hrrr/agg_scaling.nc','r')
+#fpst=nc.Dataset('/home/tsw35/tyche/wrf_hrrr/201707_long/het/OUTPUT/static_data.nc','r')
+#msk=fpst['LU_INDEX'][0,:,:]==17
+#fptime=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/time_stats_norm.nc','r')
+#fptt=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/time_stats_nr-ft.nc')
+#fptg=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/time_stats_nr-fg.nc')
 
 ### FRAMEWORK PATH ###
 frkdir='/home/tswater/Documents/Elements_Temp/WRF/'
 fpscl=nc.Dataset(frkdir+'agg_files/agg_scaling.nc','r')
-
+fpagg=nc.Dataset(frkdir+'agg_files/agg_full.nc','r')
+fp2d =nc.Dataset(frkdir+'agg_files/agg_2d.nc','r')
+fpst=nc.Dataset(frkdir+'static_data.nc','r')
+fptime=nc.Dataset(frkdir+'agg_files/time_stats_norm.nc','r')
+fptt=nc.Dataset(frkdir+'agg_files/time_stats_nr-ft.nc')
+fptg=nc.Dataset(frkdir+'agg_files/time_stats_nr-fg.nc')
+msk=fpst['LU_INDEX'][0,:,:]==17
 
 
 # %%
@@ -448,7 +459,7 @@ grid=ImageGrid(subfigs[0], 111,  # similar to subplot(111)
                 cbar_size="5%")
 
 im=grid[0].imshow(data1,origin='lower',cmap=hmap,vmin=vmin1,vmax=vmax1,interpolation='none')
-im2=grid[1].imshow(data2,origin='lower',cmap=lmap,vmin=vmin2,vmax=vmax2,interpolation='none')
+im2=grid[1].imshow(data2,origin='lower',cmap=hmap,vmin=vmin2,vmax=vmax2,interpolation='none')
 grid[0].axis(False)
 grid[1].axis(False)
 cb=grid.cbar_axes[0].colorbar(im,label=cbarlabel1)
@@ -472,8 +483,8 @@ data2=databig(data2)
 data1[msk]=float('nan')
 data2[msk]=float('nan')
 
-cbarlabel1=r'$COV_H$ ($W/m^{-2}$)'
-cbarlabel2=r'$COV_{LH}$ ($W/m^{-2}$)'
+cbarlabel1=r'$CV_H$ ($W/m^{-2}$)'
+cbarlabel2=r'$CV_{LH}$ ($W/m^{-2}$)'
 
 vmin1=0
 vmin2=0
@@ -487,7 +498,7 @@ grid=ImageGrid(subfigs[1], 111,  # similar to subplot(111)
                 cbar_location='right',
                 cbar_pad=.02,
                 cbar_size="5%")
-im=grid[0].imshow(data1,origin='lower',cmap=hmap,vmin=vmin1,vmax=vmax1,interpolation='none')
+im=grid[0].imshow(data1,origin='lower',cmap=lmap,vmin=vmin1,vmax=vmax1,interpolation='none')
 im2=grid[1].imshow(data2,origin='lower',cmap=lmap,vmin=vmin2,vmax=vmax2,interpolation='none')
 
 #im=grid[0].imshow(data1,origin='lower',cmap=hmap,interpolation='none',norm=LogNorm(vmin=0.01, vmax=1.99))
@@ -504,7 +515,7 @@ cb.set_label(label=cbarlabel2,size=lbsize)
 
 grid[0].text(-50,940,'c)',fontsize=lbsize)
 grid[1].text(-50,940,'d)',fontsize=lbsize)
-plt.savefig('fig4_alt.png', bbox_inches = "tight")
+plt.savefig('fig4_alt2.png', bbox_inches = "tight")
 
 # %%
 
@@ -572,7 +583,7 @@ ax.set_ylim(140,170)
 ax.set_yticks([145,150,155,160,165],[145,150,155,160,165],color='firebrick')
 ax2=ax.twinx()
 ax2.semilogx(scales[1:],dErr[1:],'-o',c='mediumblue',zorder=4)
-ax2.set_ylabel(r'RMSE P ($mm$)',color='mediumblue')
+ax2.set_ylabel(r'RMSD P ($mm$)',color='mediumblue')
 ax2.set_xlim(5,130)
 ax.set_xticks([6,12,15,30,60,120],[6,12,15,30,60,120])
 ax2.set_ylim(5.5,8.5)
@@ -608,8 +619,9 @@ for i in range(6):
         cb=grid.cbar_axes[i].colorbar(im,label=cbarlabel1)
         grid.cbar_axes[i].tick_params(labelsize=lbsize)
         cb.set_label(label=cbarlabel1,size=lbsize)
-        grid[i].text(-150,325,'a)',fontsize=lbsize)
-        
+        grid[i].text(-150,550,'a)',fontsize=lbsize)
+    if i==2:
+        grid[i].text(0,600,'Resolution',fontsize=lbsize+2)
 ax=subfigs[1].add_subplot(111)
 ax.plot(scales[1:],dStd[1:],'-o',c='firebrick',zorder=5)
 ax.set_ylabel(r'$\sigma_{H}$ ($W\ m^{-2}$)',color='firebrick')
@@ -620,14 +632,14 @@ ax.set_yticks([145,150,155,160,165],[145,150,155,160,165],color='firebrick')
 #ax.grid(color='dimgrey',axis='x')
 ax2=ax.twinx()
 ax2.plot(scales[1:],dErr[1:],'-o',c='mediumblue',zorder=4)
-ax2.set_ylabel(r'RMSE P ($mm$)',color='mediumblue')
+ax2.set_ylabel(r'RMSD P ($mm$)',color='mediumblue')
 ax2.set_xlim(0,130)
 ax.set_xticks([6,12,15,30,60,120],[6,'',15,30,60,120])
 ax2.set_ylim(5.5,8.5)
 ax2.set_yticks([6,6.5,7,7.5,8],[6,6.5,7,7.5,8],color='mediumblue')
 ax2.grid(False)
 #ax.xaxis.tick_top()
-plt.savefig('fig5.png', bbox_inches = "tight")
+plt.savefig('fig5_alt.png', bbox_inches = "tight")
 
 # %%
 
@@ -1472,10 +1484,8 @@ for k in boxes.keys():
     if k!='ALL':
         masks[k][msk]=False
 
-fptime=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/time_stats_norm.nc','r')
-fptt=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/time_stats_nr-ft.nc')
-fptg=nc.Dataset('/home/tsw35/tyche/wrf_gaea/all/time_stats_nr-fg.nc')
 
+# %%
 def fixit(f,locs,varlist,var):
     out=np.zeros((len(locs),257))
     i=0
@@ -1746,11 +1756,255 @@ print(np.nanmedian(d_g,axis=1))
 # %%
 print(np.nanmedian(dg,axis=1))
 
+# %% [markdown]
+# # ALT FIGURE: Wet Variables only 60km
+
 # %%
-d0
+
+# %%
+mapvars=['PW','RH2','T2','LOCLOUD','MDCLOUD','HICLOUD']
+mcmaps={'PW':'Blues','RH2':'BuPu','T2':tmap,'LOCLOUD':cmr.sepia,'MDCLOUD':cmr.sepia,'HICLOUD':cmr.sepia}
+dcmaps={'PW':'PuOr','RH2':'PRGn','T2':'RdGy','LOCLOUD':'bwr','MDCLOUD':'bwr','HICLOUD':'bwr'}
+mcblb={'PW':r'PW $(kg\ m^{-2})$','RH2':r'$RH_{2m} (\%)$','T2':r'$T_{2m} (C)$','LOCLOUD':r'$CC_{low} (\%)$','MDCLOUD':r'$CC_{mid} (\%)$','HICLOUD':r'$CC_{high} (\%)$'}
+lbsize=10
+letter=['a','b','c','d','e','f','g']
+
+alpha=1.2
+fig=plt.figure(figsize=(6.5*alpha,8*alpha),layout='tight',dpi=600)
+subfigs = fig.subfigures(len(mapvars),4, hspace=0,wspace=0, width_ratios=[1,1,.3, 1.2],frameon=False)
+
+for i in range(len(mapvars)):
+    var=mapvars[i]
+    grid=ImageGrid(subfigs[i,0], 111,  # similar to subplot(111)
+                nrows_ncols=(1, 1),
+                axes_pad=0.05,
+                cbar_mode='single',
+                cbar_location='left',
+                cbar_pad=.02,
+                cbar_size="5%")
+    
+    ### DATA PREP ###
+    datat=fp2d[var+'_het'][:]
+    datag=fp2d[var+'_hmg'][:]
+    try:
+        datat[msk]=float('nan')
+    except Exception as e:
+        datat=databig(datat)
+        datat[msk]=float('nan')
+    try:
+        datag[msk]=float('nan')
+    except Exception as e:
+        datag=databig(datag)
+        datag[msk]=float('nan')
+    if 'T2' in var:
+        datag=datag-273.15
+        datat=datat-273.15
+    if ('CLOUD' in var):
+        datag=datag*100
+        datat=datat*100
+        vmin=1
+        vmax=50
+    elif ('RH' in var):
+        vmin=1
+        vmax=100
+    else:
+        vmin=np.nanpercentile(datat,2)
+        vmax=np.nanpercentile(datat,98)
+    data3=datag-datat
+    if 'CLOUD' in var:
+        vmax3=7
+        vmin3=-7
+    elif 'T2' in var:
+        vmax3=3
+        vmin3=-3
+    elif 'PW' in var:
+        vmax3=2.5
+        vmin3=-2.5
+    else:
+        vmax3=max(np.abs(np.nanpercentile(data3,1)),np.abs(np.nanpercentile(data3,99)))
+        vmin3=-vmax3
+    
+    #imt=grid[1].imshow(datat,origin='lower',cmap=mcmaps[var],vmin=vmin,vmax=vmax)
+    img=grid[0].imshow(datag,origin='lower',cmap=mcmaps[var],vmin=vmin,vmax=vmax)
+    grid[0].axis(False)
+    #grid[1].axis(False)
+    cb=grid.cbar_axes[0].colorbar(img,label=mcblb[var])
+    grid.cbar_axes[0].tick_params(labelsize=lbsize)
+    cb.set_label(label=mcblb[var],size=lbsize)
+    grid.cbar_axes[0].yaxis.set_ticks_position('left')
+    grid.cbar_axes[0].yaxis.set_label_position('left')
+   
+    grid[0].text(-650,940,letter[i]+')',fontsize=lbsize+4)
+    
+    ### Delta Plot
+    grid=ImageGrid(subfigs[i,1], 111,  # similar to subplot(111)
+                nrows_ncols=(1, 1),
+                axes_pad=0,
+                cbar_mode='single',
+                cbar_location='right',
+                cbar_pad=.02,
+                cbar_size="5%")
+
+    im=grid[0].imshow(data3,origin='lower',cmap=dcmaps[var],vmin=vmin3,vmax=vmax3)
+    grid[0].axis(False)
+    cb=grid.cbar_axes[0].colorbar(im,label='$\Delta$'+mcblb[var])
+    grid.cbar_axes[0].tick_params(labelsize=lbsize)
+    cb.set_label(label='$\Delta$'+mcblb[var],size=lbsize)
+    
+    ### BOXPLOT ###
+    ax=subfigs[i,3].add_subplot(111)
+    dg=fixit(fptime,blist,avars,var)*100
+    ax.plot([-1,10],[0,0],linewidth=2,color='white',zorder=0)
+    ax.boxplot(dg.T,labels=blist,showfliers=False)
+    ax.tick_params(axis='x',which='both',labelsize=lbsize,labelrotation=45)
+    
+    d_g=fixit(fptg,blist,avars,var)*100
+    dd=np.nanmedian(d_g,axis=1)
+    d0=np.nanmedian(dg,axis=1)
+    cs=[]
+    for j in range(len(d0)):
+        if dd[j]>d0[j]:
+            cs.append('red')
+        else:
+            cs.append('blue')
+    ax.scatter([1,2,3,4,5,6,7,8],dd,zorder=5,c=cs,s=150,marker='_')
+    if 'CLOUD' in var:
+        ax.set_yticks([0,50,100],[0,50,100])
+        ax.minorticks_on()
+        ax.set_yticks([-20,-10,10,20,30,40,60,70,80,90,110,120],[],minor=True)
+        ax.grid(which='minor',linestyle=':',linewidth=.5,axis='y')
+        ax.set_ylim(-25,125)
+    else:
+        ax.set_yticks([-10,0,10,20],[-10,0,10,20])
+        ax.set_ylim(-15,25)
+        
+    ax.grid(visible=False,axis='x')
+    ax.yaxis.tick_right()
+    ax.yaxis.set_label_position("right")
+    ax.set_ylabel('$\%$ Change',fontsize=lbsize)
+    ax.set_xlim(.5,8.5)
+
+plt.savefig('fig9_alt2.png', bbox_inches = "tight")
+
+# %%
+
+# %%
 
 # %% [markdown]
 # # ALT MsKE
+
+# %%
+mapvars=['MsKElo','MsKE']
+mcmaps={'MsKElo':'copper','MsKE':'pink'}
+dcmaps={'MsKElo':dmmap,'MsKE':cmr.holly_r}
+mcblb={'MsKElo':r'$MsKE_{low}$ ($m^{2} s^{-2}$)',
+      'MsKE':r'$MsKE$ ($m^{2} s^{-2}$)'}
+lbsize=10
+letter=['a','b','c','d','e','f','g']
+
+alpha=1.2
+fig=plt.figure(figsize=(6.5*alpha,3*alpha),layout='tight',dpi=600)
+subfigs = fig.subfigures(len(mapvars),4, hspace=0,wspace=0, width_ratios=[1,1,.4, 1.1],frameon=False)
+
+for i in range(len(mapvars)):
+    var=mapvars[i]
+    grid=ImageGrid(subfigs[i,0], 111,  # similar to subplot(111)
+                nrows_ncols=(1, 1),
+                axes_pad=0.05,
+                cbar_mode='single',
+                cbar_location='left',
+                cbar_pad=.02,
+                cbar_size="5%")
+    
+    ### DATA PREP ###
+    datat=fp2d[var+'_het'][:]
+    datag=fp2d[var+'_hmg'][:]
+    datat=databig(datat)
+    datat[msk]=float('nan')
+    datag=databig(datag)
+    datag[msk]=float('nan')
+        
+    vmin=np.nanpercentile(datat,2)
+    vmax=np.nanpercentile(datat,98)
+    data3=datag-datat
+    
+    if 'lo' in var:
+        vmin=800
+        vmax=2400
+        vmin3=-300
+        vmax3=300
+    else:
+        vmin=8000
+        vmax=24000
+        vmin3=-3000
+        vmax3=3000
+    
+    #imt=grid[1].imshow(datat,origin='lower',cmap=mcmaps[var],vmin=vmin,vmax=vmax)
+    img=grid[0].imshow(datag,origin='lower',cmap=mcmaps[var],vmin=vmin,vmax=vmax)
+    grid[0].axis(False)
+    #grid[1].axis(False)
+    cb=grid.cbar_axes[0].colorbar(img,label=mcblb[var])
+    grid.cbar_axes[0].tick_params(labelsize=lbsize)
+    cb.set_label(label=mcblb[var],size=lbsize)
+    grid.cbar_axes[0].yaxis.set_ticks_position('left')
+    grid.cbar_axes[0].yaxis.set_label_position('left')
+   
+    grid[0].text(-750,1000,letter[i]+')',fontsize=lbsize+4)
+    
+    ### Delta Plot
+    grid=ImageGrid(subfigs[i,1], 111,  # similar to subplot(111)
+                nrows_ncols=(1, 1),
+                axes_pad=0,
+                cbar_mode='single',
+                cbar_location='right',
+                cbar_pad=.02,
+                cbar_size="5%")
+
+    im=grid[0].imshow(data3,origin='lower',cmap=dcmaps[var],vmin=vmin3,vmax=vmax3)
+    grid[0].axis(False)
+    cb=grid.cbar_axes[0].colorbar(im,label='$\Delta$'+mcblb[var])
+    grid.cbar_axes[0].tick_params(labelsize=lbsize)
+    cb.set_label(label='$\Delta$'+mcblb[var],size=lbsize)
+    
+    ### BOXPLOT ###
+    ax=subfigs[i,3].add_subplot(111)
+    dg=fixit(fptime,blist,avars,var)*100
+    ax.plot([-1,10],[0,0],linewidth=2,color='white',zorder=0)
+    ax.boxplot(dg.T,labels=blist,showfliers=False)
+    ax.tick_params(axis='x',which='both',labelsize=lbsize,labelrotation=45)
+    
+    d_g=fixit(fptg,blist,avars,var)*100
+    dd=np.nanmedian(d_g,axis=1)
+    d0=np.nanmedian(dg,axis=1)
+    cs=[]
+    for j in range(len(d0)):
+        if dd[j]>d0[j]:
+            cs.append('red')
+        else:
+            cs.append('blue')
+    ax.scatter([1,2,3,4,5,6,7,8],dd,zorder=5,c=cs,s=150,marker='_')
+    
+    ax.set_yticks([-40,-20,0,20,40],[-40,-20,0,20,40])
+    ax.minorticks_on()
+    ax.set_yticks([-30,-10,10,30],[],minor=True)
+    ax.set_ylim(-45,45)
+    ax.grid(which='minor',linestyle=':',linewidth=.5,axis='y')
+    
+    ax.grid(visible=False,axis='x')
+    ax.yaxis.tick_right()
+    ax.yaxis.set_label_position("right")
+    ax.set_ylabel('$\%$ Change',fontsize=lbsize)
+    ax.set_xlim(.5,8.5)
+
+plt.savefig('fig10_alt2.png', bbox_inches = "tight")
+
+# %%
+
+# %% [markdown] jp-MarkdownHeadingCollapsed=true
+# # ALT MSKE ONLY 60 KM
+
+# %% [markdown]
+# # ALT FIGURE: MSKE with only 60 km
 
 # %%
 mapvars=['MsKElo','MsKE']
@@ -1855,7 +2109,7 @@ for i in range(len(mapvars)):
     ax.set_ylabel('$\%$ Change',fontsize=lbsize)
     ax.set_xlim(.5,8.5)
 
-plt.savefig('fig10_alt.png', bbox_inches = "tight")
+plt.savefig('fig10.png', bbox_inches = "tight")
 
 
 # %%

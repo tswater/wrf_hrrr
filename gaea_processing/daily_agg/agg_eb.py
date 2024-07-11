@@ -46,12 +46,12 @@ for file in flist:
         continue
     print(file,flush=True)
     fpin=nc.Dataset(odir+file,'r')
-    
+
     for var in bigvars:
         data[var][t,:,:]=np.mean(fpin[var][24:48,:,:],axis=0)
 
     t=t+1
-    
+
 #### CREATE OUTPUT ####
 try:
     fp=nc.Dataset(odir+'all/agg_full.nc','r+')
@@ -60,14 +60,14 @@ except Exception:
     fp.createDimension('we',1559)
     fp.createDimension('sn',1039)
     fp.createDimension('time',N)
-    
+
 try:
     fp.createDimension('we'+dimscln,wescl)
     fp.createDimension('sn'+dimscln,snscl)
 except Exception:
     pass
-    
-    
+
+
 #### FINISH OUTPUT SETUP ####
 for var in bigvars:
     try:
@@ -76,9 +76,9 @@ for var in bigvars:
         pass
     fp[var][:]=data[var][:]
 
-    
+
 #### OUTPUT DATA ####
-    
+
 fp.close()
 
 
